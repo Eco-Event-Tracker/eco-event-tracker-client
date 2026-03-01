@@ -86,11 +86,14 @@ export function hasCreateEventErrors(errors: CreateEventFormErrors): boolean {
 }
 
 export function toCreateEventPayload(values: CreateEventFormValues): CreateEventRequest {
+  const participantCount = Number(values.participantCount);
+
   return {
     title: values.title.trim(),
     location: values.location.trim(),
     event_date: values.eventDate,
-    participant_count: Number(values.participantCount),
+    participant_count: participantCount,
+    attendance_count: participantCount,
     is_virtual: values.isVirtual,
     energy_kwh: Number(values.energyKwh),
     travel_km: Number(values.travelKm),

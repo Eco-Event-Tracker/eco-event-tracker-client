@@ -3,6 +3,7 @@ export interface CreateEventRequest {
   location: string;
   event_date: string;
   participant_count: number;
+  attendance_count?: number;
   is_virtual: boolean;
   energy_kwh: number;
   travel_km: number;
@@ -45,4 +46,13 @@ export type ReportFormat = 'csv' | 'pdf';
 
 export interface ApiErrorResponse {
   message?: string;
+}
+
+export interface RecentEventItem {
+  id: string;
+  title: string;
+  location: string;
+  event_date: string;
+  total_co2?: number;
+  saved_at: string;
 }

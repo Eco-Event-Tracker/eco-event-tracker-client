@@ -4,6 +4,7 @@ import { FormField } from '../components/ui/FormField';
 import { PageSection } from '../components/ui/PageSection';
 import { useCreateEventForm } from '../hooks/useCreateEventForm';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { upsertRecentEvent } from '../utils/recentEvents';
 
 const inputClassName =
   'w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:border-zinc-500';
@@ -19,6 +20,13 @@ export function CreateEventPage() {
     const created = await submit();
 
     if (created) {
+      upsertRecentEvent({
+        id: created.id,
+        title: created.title,
+        location: created.location,
+        event_date: created.event_date,
+        total_co2: created.emission_data.total_co2
+      });
       navigate(`/events/${created.id}`);
     }
   };

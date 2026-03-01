@@ -7,7 +7,16 @@ import type {
 } from '../types/events';
 import { env } from '../utils/env';
 
-const API_PREFIX = '/api';
+function hasApiSuffix(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.pathname.replace(/\/+$/, '').endsWith('/api');
+  } catch {
+    return value.replace(/\/+$/, '').endsWith('/api');
+  }
+}
+
+const API_PREFIX = hasApiSuffix(env.apiBaseUrl) ? '' : '/api';
 
 function getUserId(userIdOverride?: string): string {
   const userId = userIdOverride || env.apiUserId;
@@ -33,7 +42,8 @@ export async function getEventDetails(eventId: string): Promise<EventDetailsResp
     throw new Error('eventId is required');
   }
 
-  return requestJson<EventDetailsResponse>(`${API_PREFIX}/events/${eventId}`);
+  const encodedId = encodeURIComponent(eventId);
+  return requestJson<EventDetailsResponse>(`${API_PREFIX}/events/${encodedId}`);
 }
 
 export async function downloadEventReport(eventId: string, format: ReportFormat = 'csv') {
