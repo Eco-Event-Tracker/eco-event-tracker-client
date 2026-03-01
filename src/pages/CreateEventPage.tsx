@@ -151,21 +151,6 @@ export function CreateEventPage() {
         </div>
       </PageSection>
 
-      <PageSection
-        title="Request Context"
-        description="Provide a user ID for the required x-user-id header, or set VITE_API_USER_ID in .env."
-      >
-        <FormField label="x-user-id" htmlFor="userId" error={errors.userId}>
-          <input
-            id="userId"
-            className={inputClassName}
-            placeholder="user uuid"
-            value={values.userId}
-            onChange={(event) => setField('userId', event.target.value)}
-          />
-        </FormField>
-      </PageSection>
-
       {submitError ? (
         <div className="rounded-2xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-200">{submitError}</div>
       ) : null}

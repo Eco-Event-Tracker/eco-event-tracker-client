@@ -1,17 +1,8 @@
-import { createContext, useContext, useMemo, useState, type PropsWithChildren } from 'react';
-import { login, signup } from '../api/auth';
-import type { AuthSession } from '../types/auth';
-import { clearAuthSession, getAuthSession, saveAuthSession } from '../utils/authSession';
-
-interface AuthContextValue {
-  session: AuthSession | null;
-  isAuthenticated: boolean;
-  loginWithPassword: (email: string, password: string) => Promise<AuthSession>;
-  signupWithPassword: (name: string, email: string, password: string) => Promise<AuthSession>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+import { useMemo, useState, type PropsWithChildren } from 'react';
+import { login, signup } from '../../api/auth';
+import { AuthContext } from '../../context/authContext';
+import type { AuthSession } from '../../types/auth';
+import { clearAuthSession, getAuthSession, saveAuthSession } from '../../utils/authSession';
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(() => getAuthSession());
@@ -47,13 +38,4 @@ export function AuthProvider({ children }: PropsWithChildren) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-
-  return context;
 }

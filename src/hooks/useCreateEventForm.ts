@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { createEvent } from '../api/events';
 import type { CreateEventResponse } from '../types/events';
-import { env } from '../utils/env';
+import { useAuth } from './useAuth';
 import {
   getInitialCreateEventFormValues,
   hasCreateEventErrors,
@@ -21,7 +21,8 @@ interface UseCreateEventFormResult {
 }
 
 export function useCreateEventForm(): UseCreateEventFormResult {
-  const initialValues = useMemo(() => getInitialCreateEventFormValues(env.apiUserId), []);
+  const initialValues = useMemo(() => getInitialCreateEventFormValues(), []);
+  const { session } = useAuth();
 
   const [values, setValues] = useState<CreateEventFormValues>(initialValues);
   const [errors, setErrors] = useState<CreateEventFormErrors>({});
@@ -46,7 +47,12 @@ export function useCreateEventForm(): UseCreateEventFormResult {
     setSubmitError('');
 
     try {
-      return await createEvent(toCreateEventPayload(values), values.userId.trim() || undefined);
+      const userId = session?.user.id;
+      if (!userId) {
+        throw new Error('Please login to create an event.');
+      }
+
+      return await createEvent(toCreateEventPayload(values), userId);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to create event.';
       setSubmitError(message);

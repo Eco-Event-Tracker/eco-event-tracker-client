@@ -14,6 +14,5 @@ function parseTimeout(input: string | undefined): number {
 
 export const env = {
   apiBaseUrl: normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL),
-  apiUserId: import.meta.env.VITE_API_USER_ID || '',
   apiTimeoutMs: parseTimeout(import.meta.env.VITE_API_TIMEOUT_MS)
 };

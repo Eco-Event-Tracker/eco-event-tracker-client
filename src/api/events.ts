@@ -5,7 +5,7 @@ import type {
   EventDetailsResponse,
   ReportFormat
 } from '../types/events';
-import { env } from '../utils/env';
+import { apiPath } from '../utils/apiPath';
 
 interface RawCreateEventResponse {
   id: string;
@@ -38,25 +38,6 @@ interface RawEventDetailsResponse {
     catering?: number;
     waste?: number;
   };
-}
-
-function hasApiSuffix(value: string): boolean {
-  try {
-    const parsed = new URL(value);
-    return parsed.pathname.replace(/\/+$/, '').endsWith('/api');
-  } catch {
-    return value.replace(/\/+$/, '').endsWith('/api');
-  }
-}
-
-const API_PREFIX = hasApiSuffix(env.apiBaseUrl) ? '' : '/api';
-
-function getUserId(userIdOverride?: string): string {
-  const userId = userIdOverride || env.apiUserId;
-  if (!userId) {
-    throw new Error('x-user-id is required. Set VITE_API_USER_ID in your .env file.');
-  }
-  return userId;
 }
 
 function asNumber(value: unknown, fallback = 0): number {
@@ -98,12 +79,16 @@ function normalizeEventDetailsResponse(raw: RawEventDetailsResponse): EventDetai
   };
 }
 
-export async function createEvent(payload: CreateEventRequest, userIdOverride?: string): Promise<CreateEventResponse> {
-  const raw = await requestJson<RawCreateEventResponse>(`${API_PREFIX}/events`, {
+export async function createEvent(payload: CreateEventRequest, userId: string): Promise<CreateEventResponse> {
+  if (!userId) {
+    throw new Error('x-user-id is required.');
+  }
+
+  const raw = await requestJson<RawCreateEventResponse>(apiPath('/events'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': getUserId(userIdOverride)
+      'x-user-id': userId
     },
     body: JSON.stringify(payload)
   });
@@ -117,7 +102,7 @@ export async function getEventDetails(eventId: string): Promise<EventDetailsResp
   }
 
   const encodedId = encodeURIComponent(eventId);
-  const raw = await requestJson<RawEventDetailsResponse>(`${API_PREFIX}/events/${encodedId}`);
+  const raw = await requestJson<RawEventDetailsResponse>(apiPath(`/events/${encodedId}`));
   return normalizeEventDetailsResponse(raw);
 }
 
@@ -127,5 +112,5 @@ export async function downloadEventReport(eventId: string, format: ReportFormat 
   }
 
   const encodedId = encodeURIComponent(eventId);
-  return requestFile(`${API_PREFIX}/events/${encodedId}/report?format=${format}`);
+  return requestFile(apiPath(`/events/${encodedId}/report?format=${format}`));
 }
