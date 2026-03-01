@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.ts';
 
 export function AppShell({ children }: PropsWithChildren) {
   const location = useLocation();

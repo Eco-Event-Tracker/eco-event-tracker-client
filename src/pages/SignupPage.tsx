@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { FormField } from '../components/ui/FormField';
 import { PageSection } from '../components/ui/PageSection';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.ts';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const inputClassName =
