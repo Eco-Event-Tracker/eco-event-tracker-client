@@ -10,7 +10,6 @@ export interface CreateEventFormValues {
   travelKm: string;
   cateringMeals: string;
   wasteKg: string;
-  userId: string;
 }
 
 export type CreateEventFormErrors = Partial<Record<keyof CreateEventFormValues, string>>;
@@ -19,7 +18,7 @@ function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function getInitialCreateEventFormValues(defaultUserId = ''): CreateEventFormValues {
+export function getInitialCreateEventFormValues(): CreateEventFormValues {
   return {
     title: '',
     location: '',
@@ -29,8 +28,7 @@ export function getInitialCreateEventFormValues(defaultUserId = ''): CreateEvent
     energyKwh: '0',
     travelKm: '0',
     cateringMeals: '0',
-    wasteKg: '0',
-    userId: defaultUserId
+    wasteKg: '0'
   };
 }
 
