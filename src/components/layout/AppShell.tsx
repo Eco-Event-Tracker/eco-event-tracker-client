@@ -22,6 +22,14 @@ export function AppShell({ children }: PropsWithChildren) {
                     location.pathname === '/' ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-300 hover:bg-zinc-800'
                   }`}
                 >
+                  Planner
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
+                    location.pathname === '/dashboard' ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-300 hover:bg-zinc-800'
+                  }`}
+                >
                   Dashboard
                 </Link>
                 <Link

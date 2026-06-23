@@ -3,6 +3,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppShell } from './components/layout/AppShell';
 import { CreateEventPage } from './pages/CreateEventPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { PlannerPage } from './pages/PlannerPage';
 import { EventDetailsPage } from './pages/EventDetailsPage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -16,6 +17,14 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route
           path="/"
+          element={
+            <ProtectedRoute>
+              <PlannerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <DashboardPage />
