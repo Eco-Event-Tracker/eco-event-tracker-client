@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: eco-event-buddy
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    # Serve index.html for every path so client-side routes (e.g. /dashboard,
+    # /login) work on hard refresh / deep link instead of returning a 404.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

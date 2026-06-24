@@ -6,7 +6,6 @@ import { PlannerInsights } from '../components/planner/PlannerInsights';
 import { FormField } from '../components/ui/FormField';
 import { PageSection } from '../components/ui/PageSection';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { upsertRecentEvent } from '../utils/recentEvents';
 import { plannerInputClassName } from '../components/planner/constants';
 import { useSaveEventForm } from '../hooks/useSaveEventForm';
 
@@ -29,13 +28,6 @@ export function CreateEventPage() {
     const created = await submit();
 
     if (created) {
-      upsertRecentEvent({
-        id: created.id,
-        title: created.title,
-        location: created.location,
-        event_date: created.event_date,
-        total_co2: created.estimated_co2
-      });
       navigate(`/events/${created.id}`);
     }
   };

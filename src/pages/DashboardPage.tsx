@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PageSection } from '../components/ui/PageSection';
-import { useRecentEvents } from '../hooks/useRecentEvents';
+import { useEvents } from '../hooks/useEvents';
 import { formatDate, formatKg } from '../utils/format';
 
 export function DashboardPage() {
   usePageTitle('Dashboard');
-  const { recentEvents, removeEvent, clearAll } = useRecentEvents();
+  const { events, isLoading, error, refetch, removeEvent } = useEvents();
 
   return (
     <div className="space-y-6">
@@ -14,20 +14,30 @@ export function DashboardPage() {
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-zinc-400">
-              Saved events are stored locally from created/viewed records because the backend has no list endpoint.
+              Your saved events, stored on your account and available on any device.
             </p>
-            {recentEvents.length > 0 ? (
+            {error ? (
               <button
                 type="button"
-                onClick={clearAll}
+                onClick={() => void refetch()}
                 className="rounded-2xl border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-200"
               >
-                Clear list
+                Retry
               </button>
             ) : null}
           </div>
 
-          {recentEvents.length === 0 ? (
+          {error ? (
+            <div className="rounded-2xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-200">
+              {error}
+            </div>
+          ) : null}
+
+          {isLoading ? (
+            <div className="rounded-2xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-400">
+              Loading your events...
+            </div>
+          ) : events.length === 0 && !error ? (
             <div className="rounded-2xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-400">
               No events saved yet.{' '}
               <Link to="/events/new" className="text-emerald-300 hover:text-emerald-200">
@@ -37,7 +47,7 @@ export function DashboardPage() {
             </div>
           ) : (
             <ul className="space-y-3">
-              {recentEvents.map((event) => (
+              {events.map((event) => (
                 <li
                   key={event.id}
                   className="rounded-3xl border border-zinc-800 bg-zinc-950 p-4"
@@ -50,7 +60,7 @@ export function DashboardPage() {
                       </p>
                     </div>
                     <div className="rounded-2xl border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-300">
-                      Total: {typeof event.total_co2 === 'number' ? formatKg(event.total_co2) : 'Pending'}
+                      Total: {typeof event.estimated_co2 === 'number' ? formatKg(event.estimated_co2) : 'Pending'}
                     </div>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -62,7 +72,7 @@ export function DashboardPage() {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => removeEvent(event.id)}
+                      onClick={() => void removeEvent(event.id)}
                       className="rounded-2xl border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-200"
                     >
                       Remove

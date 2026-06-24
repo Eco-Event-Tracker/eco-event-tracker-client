@@ -31,11 +31,13 @@ export interface ApiErrorResponse {
   message?: string;
 }
 
-export interface RecentEventItem {
+export interface EventSummary {
   id: string;
   title: string;
   location: string;
   event_date: string;
-  total_co2?: number;
-  saved_at: string;
+  participant_count: number;
+  is_virtual: boolean;
+  estimated_co2: number;
+  created_at: string;
 }

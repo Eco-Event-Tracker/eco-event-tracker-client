@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { downloadEventReport } from '../api/events';
 import { PlannerFootprintPanel } from '../components/planner/PlannerFootprintPanel';
@@ -9,7 +9,6 @@ import type { ReportFormat } from '../types/events';
 import { triggerFileDownload } from '../utils/file';
 import { formatDate } from '../utils/format';
 import { countPeople } from '../utils/planner';
-import { upsertRecentEvent } from '../utils/recentEvents';
 
 function formatLabel(format: string): string {
   switch (format) {
@@ -36,20 +35,6 @@ export function EventDetailsPage() {
     () => (eventDetails ? countPeople(eventDetails.plan) : 0),
     [eventDetails]
   );
-
-  useEffect(() => {
-    if (!eventDetails || !eventId) {
-      return;
-    }
-
-    upsertRecentEvent({
-      id: eventId,
-      title: eventDetails.title,
-      location: eventDetails.location,
-      event_date: eventDetails.event_date,
-      total_co2: eventDetails.estimate.total
-    });
-  }, [eventDetails, eventId]);
 
   const handleDownload = async (format: ReportFormat) => {
     if (!eventId) {
