@@ -2,6 +2,7 @@ import { requestFile, requestJson } from './http';
 import type {
   CreateEventRequest,
   CreateEventResponse,
+  EventDetails,
   EventDetailsResponse,
   EventSummary,
   ReportFormat
@@ -24,6 +25,7 @@ interface RawEventDetailsResponse {
   location: string;
   event_date: string;
   plan?: EstimateInput;
+  details?: EventDetails;
   estimate?: EstimateResult;
 }
 
@@ -35,6 +37,7 @@ interface RawEventSummary {
   participant_count?: number;
   is_virtual?: boolean;
   estimated_co2?: number;
+  category?: string;
   created_at?: string;
 }
 
@@ -67,6 +70,7 @@ function normalizeEventSummary(raw: RawEventSummary): EventSummary {
     participant_count: asNumber(raw.participant_count),
     is_virtual: raw.is_virtual ?? false,
     estimated_co2: asNumber(raw.estimated_co2),
+    category: raw.category,
     created_at: raw.created_at ?? ''
   };
 }
@@ -81,6 +85,7 @@ function normalizeEventDetailsResponse(raw: RawEventDetailsResponse): EventDetai
     location: raw.location,
     event_date: raw.event_date,
     plan: raw.plan,
+    details: raw.details ?? {},
     estimate: raw.estimate
   };
 }

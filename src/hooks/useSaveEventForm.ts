@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useContext, useState } from 'react';
 import { createEvent } from '../api/events';
+import { PlannerContext } from '../context/plannerContext';
 import type { CreateEventResponse } from '../types/events';
 import { useAuth } from './useAuth';
 import { usePlanner } from './usePlanner';
 import {
   canSaveEvent,
-  getInitialEventMetadata,
   hasEventMetadataErrors,
   toCreateEventPayload,
   validateEventMetadata,
@@ -25,17 +25,21 @@ interface UseSaveEventFormResult {
 }
 
 export function useSaveEventForm(): UseSaveEventFormResult {
-  const initialMetadata = useMemo(() => getInitialEventMetadata(), []);
+  const context = useContext(PlannerContext);
+  if (!context) {
+    throw new Error('useSaveEventForm must be used within PlannerProvider');
+  }
+
   const { session } = useAuth();
   const planner = usePlanner();
+  const { metadata, setMetadataField: setSharedMetadataField, resetForm } = context;
 
-  const [metadata, setMetadata] = useState<EventMetadataValues>(initialMetadata);
   const [metadataErrors, setMetadataErrors] = useState<EventMetadataErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const setMetadataField = <K extends keyof EventMetadataValues>(field: K, value: EventMetadataValues[K]) => {
-    setMetadata((current) => ({ ...current, [field]: value }));
+    setSharedMetadataField(field, value);
     setMetadataErrors((current) => ({ ...current, [field]: undefined }));
     setSubmitError('');
   };
@@ -63,7 +67,9 @@ export function useSaveEventForm(): UseSaveEventFormResult {
         throw new Error('Please login to save an event.');
       }
 
-      return await createEvent(toCreateEventPayload(metadata, planner.values), userId);
+      const created = await createEvent(toCreateEventPayload(metadata, planner.values), userId);
+      resetForm();
+      return created;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to save event.';
       setSubmitError(message);

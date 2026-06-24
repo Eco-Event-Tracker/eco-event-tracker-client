@@ -1,10 +1,16 @@
 import type { EstimateInput, EstimateResult } from './estimate';
 
+export interface EventDetails {
+  description?: string;
+  category?: string;
+}
+
 export interface CreateEventRequest {
   title: string;
   location: string;
   event_date: string;
   plan: EstimateInput;
+  details?: EventDetails;
 }
 
 export interface CreateEventResponse {
@@ -22,6 +28,7 @@ export interface EventDetailsResponse {
   location: string;
   event_date: string;
   plan: EstimateInput;
+  details: EventDetails;
   estimate: EstimateResult;
 }
 
@@ -39,5 +46,6 @@ export interface EventSummary {
   participant_count: number;
   is_virtual: boolean;
   estimated_co2: number;
+  category?: string;
   created_at: string;
 }

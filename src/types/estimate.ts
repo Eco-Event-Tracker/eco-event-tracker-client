@@ -16,6 +16,12 @@ export interface EstimateInput {
   catering?: CateringOption;
   waste_disposal?: WasteDisposalOption;
   stream_quality?: StreamQuality;
+  /** Measured venue electricity for the whole event, in kWh (hindsight actual). */
+  energy_kwh?: number;
+  /** Measured total waste for the whole event, in kg (hindsight actual). */
+  waste_kg?: number;
+  /** Actual number of meals served across the whole event (hindsight actual). */
+  meals_served?: number;
 }
 
 export interface EstimateBreakdown {

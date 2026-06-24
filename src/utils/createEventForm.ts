@@ -6,9 +6,21 @@ export interface EventMetadataValues {
   title: string;
   location: string;
   eventDate: string;
+  /** Optional descriptive fields (do not affect the estimate). */
+  description: string;
+  category: string;
 }
 
 export type EventMetadataErrors = Partial<Record<keyof EventMetadataValues, string>>;
+
+export const EVENT_CATEGORIES = [
+  'Conference',
+  'Workshop',
+  'Concert / Festival',
+  'Sports',
+  'Community',
+  'Other'
+] as const;
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
@@ -18,7 +30,9 @@ export function getInitialEventMetadata(): EventMetadataValues {
   return {
     title: '',
     location: '',
-    eventDate: todayIsoDate()
+    eventDate: todayIsoDate(),
+    description: '',
+    category: ''
   };
 }
 
@@ -48,11 +62,18 @@ export function toCreateEventPayload(
   metadata: EventMetadataValues,
   plannerValues: PlannerValues
 ): CreateEventRequest {
+  const description = metadata.description.trim();
+  const category = metadata.category.trim();
+  const details: CreateEventRequest['details'] = {};
+  if (description) details.description = description;
+  if (category) details.category = category;
+
   return {
     title: metadata.title.trim(),
     location: metadata.location.trim(),
     event_date: metadata.eventDate,
-    plan: toEstimateInput(plannerValues)
+    plan: toEstimateInput(plannerValues),
+    ...(Object.keys(details).length > 0 ? { details } : {})
   };
 }
 

@@ -21,6 +21,10 @@ export interface PlannerValues {
   catering: CateringOption;
   wasteDisposal: WasteDisposalOption;
   streamQuality: StreamQuality;
+  // Measured actuals — only collected when recording a past event. Empty = unknown.
+  energyKwh: string;
+  wasteKg: string;
+  mealsServed: string;
 }
 
 export function getInitialPlannerValues(): PlannerValues {
@@ -34,7 +38,10 @@ export function getInitialPlannerValues(): PlannerValues {
     audienceReach: 'regional',
     catering: 'meat_heavy',
     wasteDisposal: 'landfill',
-    streamQuality: 'hd'
+    streamQuality: 'hd',
+    energyKwh: '',
+    wasteKg: '',
+    mealsServed: ''
   };
 }
 
@@ -61,6 +68,21 @@ function toPositiveDays(value: string): number {
   return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
 }
 
+/** Parse an optional measured field: blank/invalid → undefined (use the estimate). */
+function toOptionalNonNegative(value: string): number | undefined {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+}
+
+function toOptionalNonNegativeInt(value: string): number | undefined {
+  const parsed = toOptionalNonNegative(value);
+  return parsed === undefined ? undefined : Math.round(parsed);
+}
+
 export function toEstimateInput(values: PlannerValues): EstimateInput {
   const physical = isPhysicalFormat(values.format);
   const online = hasOnlineFormat(values.format);
@@ -75,7 +97,10 @@ export function toEstimateInput(values: PlannerValues): EstimateInput {
     audience_reach: physical ? values.audienceReach : undefined,
     catering: physical ? values.catering : undefined,
     waste_disposal: physical ? values.wasteDisposal : undefined,
-    stream_quality: online ? values.streamQuality : undefined
+    stream_quality: online ? values.streamQuality : undefined,
+    energy_kwh: physical ? toOptionalNonNegative(values.energyKwh) : undefined,
+    waste_kg: physical ? toOptionalNonNegative(values.wasteKg) : undefined,
+    meals_served: physical ? toOptionalNonNegativeInt(values.mealsServed) : undefined
   };
 }
 

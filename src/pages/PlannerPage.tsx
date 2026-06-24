@@ -32,14 +32,13 @@ export function PlannerPage() {
         emptyState={
           <div className="flex flex-col items-start gap-3 py-2">
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
-              Carbon Planner
+              Live estimate
             </span>
             <p className="font-display text-2xl font-semibold text-emerald-50 sm:text-3xl">
-              Plan your event&rsquo;s footprint
+              Estimate your footprint
             </p>
             <p className="max-w-md text-base text-emerald-200/70">
-              Add your event details below and the estimate appears here instantly &mdash; before
-              anything is booked.
+              Set the levers below and your footprint updates here instantly.
             </p>
             <button
               type="button"

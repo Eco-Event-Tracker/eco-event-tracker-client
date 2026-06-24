@@ -96,11 +96,23 @@ export function EventDetailsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold text-zinc-100">{eventDetails.title}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold text-zinc-100">{eventDetails.title}</h1>
+          {eventDetails.details.category ? (
+            <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+              {eventDetails.details.category}
+            </span>
+          ) : null}
+        </div>
         <p className="mt-2 text-sm text-zinc-400">
           {eventDetails.location} • {formatDate(eventDetails.event_date)} •{' '}
           {formatLabel(eventDetails.plan.format)} • {totalPeople} participants
         </p>
+        {eventDetails.details.description ? (
+          <p className="mt-3 max-w-2xl whitespace-pre-line text-sm text-zinc-300">
+            {eventDetails.details.description}
+          </p>
+        ) : null}
       </header>
 
       <PlannerFootprintPanel result={eventDetails.estimate} totalPeople={totalPeople} showLiveIndicator={false} />
