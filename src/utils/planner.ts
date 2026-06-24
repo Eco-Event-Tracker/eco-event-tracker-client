@@ -87,3 +87,27 @@ export const BREAKDOWN_CATEGORIES: BreakdownCategory[] = [
   { key: 'waste', label: 'Waste', color: '#22C55E' },
   { key: 'streaming', label: 'Streaming', color: '#3B82F6' }
 ];
+
+export type FootprintLevel = 'good' | 'moderate' | 'high';
+
+export interface FootprintGrade {
+  level: FootprintLevel;
+  label: string;
+  color: string;
+}
+
+// Per-attendee kg CO2e thresholds — indicative and tunable. Benchmarked to
+// event-sector averages: a lean local event sits near 5-10 kg/head, while
+// travel-heavy national/international events climb well past 25 kg/head.
+const GRADE_LOW_MAX = 10;
+const GRADE_MODERATE_MAX = 25;
+
+export function gradeFootprint(perAttendee: number): FootprintGrade {
+  if (perAttendee <= GRADE_LOW_MAX) {
+    return { level: 'good', label: 'Low', color: '#34D399' };
+  }
+  if (perAttendee <= GRADE_MODERATE_MAX) {
+    return { level: 'moderate', label: 'Moderate', color: '#FBBF24' };
+  }
+  return { level: 'high', label: 'High', color: '#F87171' };
+}
