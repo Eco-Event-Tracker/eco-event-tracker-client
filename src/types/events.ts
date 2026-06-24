@@ -1,14 +1,10 @@
+import type { EstimateInput, EstimateResult } from './estimate';
+
 export interface CreateEventRequest {
   title: string;
   location: string;
   event_date: string;
-  participant_count: number;
-  attendance_count?: number;
-  is_virtual: boolean;
-  energy_kwh: number;
-  travel_km: number;
-  catering_meals: number;
-  waste_kg: number;
+  plan: EstimateInput;
 }
 
 export interface CreateEventResponse {
@@ -18,28 +14,15 @@ export interface CreateEventResponse {
   event_date: string;
   participant_count: number;
   is_virtual: boolean;
-  emission_data: {
-    energy_kwh: number;
-    travel_km: number;
-    catering_meals: number;
-    waste_kg: number;
-    total_co2: number;
-  };
+  estimated_co2: number;
 }
 
 export interface EventDetailsResponse {
   title: string;
   location: string;
   event_date: string;
-  participant_count: number;
-  is_virtual: boolean;
-  total_co2: number;
-  breakdown: {
-    energy: number;
-    travel: number;
-    catering: number;
-    waste: number;
-  };
+  plan: EstimateInput;
+  estimate: EstimateResult;
 }
 
 export type ReportFormat = 'csv' | 'pdf';

@@ -9,7 +9,7 @@ interface FormFieldProps extends PropsWithChildren {
 export function FormField({ label, htmlFor, error, children }: FormFieldProps) {
   return (
     <label htmlFor={htmlFor} className="block space-y-2">
-      <span className="text-sm font-medium text-zinc-200">{label}</span>
+      <span className="text-base font-medium text-zinc-200">{label}</span>
       {children}
       {error ? <span className="block text-xs text-red-300">{error}</span> : null}
     </label>

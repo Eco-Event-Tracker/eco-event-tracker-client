@@ -39,6 +39,15 @@ export function usePlanner(): UsePlannerResult {
     let cancelled = false;
 
     const handle = setTimeout(() => {
+      if (countPeople(input) <= 0) {
+        if (!cancelled) {
+          setResult(null);
+          setError('');
+          setIsLoading(false);
+        }
+        return;
+      }
+
       setIsLoading(true);
       estimateEvent(input)
         .then((estimate) => {

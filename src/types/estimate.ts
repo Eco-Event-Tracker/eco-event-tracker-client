@@ -10,6 +10,7 @@ export interface EstimateInput {
   attendance: number;
   online_attendance?: number;
   duration_hours: number;
+  days?: number;
   power_source?: PowerSourceOption;
   audience_reach?: AudienceReach;
   catering?: CateringOption;
@@ -23,6 +24,7 @@ export interface EstimateBreakdown {
   catering: number;
   waste: number;
   streaming: number;
+  accommodation: number;
 }
 
 export interface EstimateAction {

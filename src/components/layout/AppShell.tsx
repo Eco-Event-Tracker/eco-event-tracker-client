@@ -38,7 +38,7 @@ export function AppShell({ children }: PropsWithChildren) {
                     location.pathname === '/events/new' ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-300 hover:bg-zinc-800'
                   }`}
                 >
-                  Create Event
+                  Record Event
                 </Link>
               </nav>
               <div className="flex items-center gap-2">

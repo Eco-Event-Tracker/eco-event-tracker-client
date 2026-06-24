@@ -5,6 +5,7 @@ import type {
   EventDetailsResponse,
   ReportFormat
 } from '../types/events';
+import type { EstimateInput, EstimateResult } from '../types/estimate';
 import { apiPath } from '../utils/apiPath';
 
 interface RawCreateEventResponse {
@@ -13,31 +14,16 @@ interface RawCreateEventResponse {
   location: string;
   event_date: string;
   participant_count?: number;
-  attendance_count?: number;
   is_virtual?: boolean;
-  emission_data?: {
-    energy_kwh?: number;
-    travel_km?: number;
-    catering_meals?: number;
-    waste_kg?: number;
-    total_co2?: number;
-  };
+  estimated_co2?: number;
 }
 
 interface RawEventDetailsResponse {
   title: string;
   location: string;
   event_date: string;
-  participant_count?: number;
-  attendance_count?: number;
-  is_virtual?: boolean;
-  total_co2?: number;
-  breakdown?: {
-    energy?: number;
-    travel?: number;
-    catering?: number;
-    waste?: number;
-  };
+  plan?: EstimateInput;
+  estimate?: EstimateResult;
 }
 
 function asNumber(value: unknown, fallback = 0): number {
@@ -50,32 +36,23 @@ function normalizeCreateEventResponse(raw: RawCreateEventResponse): CreateEventR
     title: raw.title,
     location: raw.location,
     event_date: raw.event_date,
-    participant_count: asNumber(raw.participant_count ?? raw.attendance_count),
+    participant_count: asNumber(raw.participant_count),
     is_virtual: raw.is_virtual ?? false,
-    emission_data: {
-      energy_kwh: asNumber(raw.emission_data?.energy_kwh),
-      travel_km: asNumber(raw.emission_data?.travel_km),
-      catering_meals: asNumber(raw.emission_data?.catering_meals),
-      waste_kg: asNumber(raw.emission_data?.waste_kg),
-      total_co2: asNumber(raw.emission_data?.total_co2)
-    }
+    estimated_co2: asNumber(raw.estimated_co2)
   };
 }
 
 function normalizeEventDetailsResponse(raw: RawEventDetailsResponse): EventDetailsResponse {
+  if (!raw.plan || !raw.estimate) {
+    throw new Error('Event details are missing plan or estimate data.');
+  }
+
   return {
     title: raw.title,
     location: raw.location,
     event_date: raw.event_date,
-    participant_count: asNumber(raw.participant_count ?? raw.attendance_count),
-    is_virtual: raw.is_virtual ?? false,
-    total_co2: asNumber(raw.total_co2),
-    breakdown: {
-      energy: asNumber(raw.breakdown?.energy),
-      travel: asNumber(raw.breakdown?.travel),
-      catering: asNumber(raw.breakdown?.catering),
-      waste: asNumber(raw.breakdown?.waste)
-    }
+    plan: raw.plan,
+    estimate: raw.estimate
   };
 }
 

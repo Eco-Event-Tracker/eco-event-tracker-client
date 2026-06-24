@@ -1,13 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { downloadEventReport } from '../api/events';
-import { PageSection } from '../components/ui/PageSection';
+import { PlannerFootprintPanel } from '../components/planner/PlannerFootprintPanel';
+import { PlannerInsights } from '../components/planner/PlannerInsights';
 import { useEventDetails } from '../hooks/useEventDetails';
 import { usePageTitle } from '../hooks/usePageTitle';
 import type { ReportFormat } from '../types/events';
 import { triggerFileDownload } from '../utils/file';
-import { formatDate, formatKg } from '../utils/format';
+import { formatDate } from '../utils/format';
+import { countPeople } from '../utils/planner';
 import { upsertRecentEvent } from '../utils/recentEvents';
+
+function formatLabel(format: string): string {
+  switch (format) {
+    case 'in_person':
+      return 'In person';
+    case 'hybrid':
+      return 'Hybrid';
+    case 'virtual':
+      return 'Virtual';
+    default:
+      return format;
+  }
+}
 
 export function EventDetailsPage() {
   const { eventId = '' } = useParams();
@@ -16,6 +31,11 @@ export function EventDetailsPage() {
   const [downloading, setDownloading] = useState<ReportFormat | null>(null);
 
   usePageTitle('Event Details');
+
+  const totalPeople = useMemo(
+    () => (eventDetails ? countPeople(eventDetails.plan) : 0),
+    [eventDetails]
+  );
 
   useEffect(() => {
     if (!eventDetails || !eventId) {
@@ -27,7 +47,7 @@ export function EventDetailsPage() {
       title: eventDetails.title,
       location: eventDetails.location,
       event_date: eventDetails.event_date,
-      total_co2: eventDetails.total_co2
+      total_co2: eventDetails.estimate.total
     });
   }, [eventDetails, eventId]);
 
@@ -78,7 +98,7 @@ export function EventDetailsPage() {
             Retry
           </button>
           <Link
-            to="/"
+            to="/dashboard"
             className="rounded-2xl border border-zinc-700 bg-zinc-800 px-5 py-2.5 text-sm font-medium text-zinc-200"
           >
             Back to Dashboard
@@ -94,46 +114,42 @@ export function EventDetailsPage() {
         <h1 className="text-2xl font-semibold text-zinc-100">{eventDetails.title}</h1>
         <p className="mt-2 text-sm text-zinc-400">
           {eventDetails.location} • {formatDate(eventDetails.event_date)} •{' '}
-          {eventDetails.is_virtual ? 'Virtual' : 'In-person'} • {eventDetails.participant_count} participants
+          {formatLabel(eventDetails.plan.format)} • {totalPeople} participants
         </p>
-        <p className="mt-1 text-xs text-zinc-500">Event ID: {eventId || 'unknown'}</p>
       </header>
 
-      <PageSection title="Total CO2" description="Automatically calculated from event emission data.">
-        <p className="text-4xl font-bold tracking-tight text-zinc-50 sm:text-5xl">{formatKg(eventDetails.total_co2)}</p>
-      </PageSection>
+      <PlannerFootprintPanel result={eventDetails.estimate} totalPeople={totalPeople} showLiveIndicator={false} />
 
-      <PageSection title="Breakdown" description="Emission by category. Chart view is intentionally left for a later phase.">
-        <ul className="grid gap-3 text-sm text-zinc-300 sm:grid-cols-2">
-          <li className="rounded-3xl border border-zinc-800 bg-zinc-950 p-4">Energy: {formatKg(eventDetails.breakdown.energy)}</li>
-          <li className="rounded-3xl border border-zinc-800 bg-zinc-950 p-4">Travel: {formatKg(eventDetails.breakdown.travel)}</li>
-          <li className="rounded-3xl border border-zinc-800 bg-zinc-950 p-4">Catering: {formatKg(eventDetails.breakdown.catering)}</li>
-          <li className="rounded-3xl border border-zinc-800 bg-zinc-950 p-4">Waste: {formatKg(eventDetails.breakdown.waste)}</li>
-        </ul>
-      </PageSection>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PlannerInsights result={eventDetails.estimate} />
 
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => void handleDownload('csv')}
-          className="rounded-2xl border border-zinc-700 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-950 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-300"
-          disabled={downloading !== null}
-        >
-          {downloading === 'csv' ? 'Downloading CSV...' : 'Download Report (CSV)'}
-        </button>
-        <button
-          type="button"
-          onClick={() => void handleDownload('pdf')}
-          className="rounded-2xl border border-zinc-700 bg-zinc-800 px-5 py-2.5 text-sm font-medium text-zinc-200 disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={downloading !== null}
-        >
-          {downloading === 'pdf' ? 'Downloading PDF...' : 'Download Report (PDF)'}
-        </button>
+        <div className="space-y-4 lg:col-start-2 lg:row-start-1">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => void handleDownload('csv')}
+              className="rounded-2xl border border-zinc-700 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-950 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-300"
+              disabled={downloading !== null}
+            >
+              {downloading === 'csv' ? 'Downloading CSV...' : 'Download Report (CSV)'}
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleDownload('pdf')}
+              className="rounded-2xl border border-zinc-700 bg-zinc-800 px-5 py-2.5 text-sm font-medium text-zinc-200 disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={downloading !== null}
+            >
+              {downloading === 'pdf' ? 'Downloading PDF...' : 'Download Report (PDF)'}
+            </button>
+          </div>
+
+          {downloadError ? (
+            <div className="rounded-2xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-200">
+              {downloadError}
+            </div>
+          ) : null}
+        </div>
       </div>
-
-      {downloadError ? (
-        <div className="rounded-2xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-200">{downloadError}</div>
-      ) : null}
     </div>
   );
 }

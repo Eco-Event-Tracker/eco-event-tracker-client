@@ -3,6 +3,7 @@ import type {
   CateringOption,
   EstimateBreakdown,
   EstimateInput,
+  EstimateResult,
   EventFormat,
   PowerSourceOption,
   StreamQuality,
@@ -14,6 +15,7 @@ export interface PlannerValues {
   attendance: string;
   onlineAttendance: string;
   durationHours: string;
+  days: string;
   powerSource: PowerSourceOption;
   audienceReach: AudienceReach;
   catering: CateringOption;
@@ -24,9 +26,10 @@ export interface PlannerValues {
 export function getInitialPlannerValues(): PlannerValues {
   return {
     format: 'in_person',
-    attendance: '330',
+    attendance: '0',
     onlineAttendance: '0',
     durationHours: '8',
+    days: '1',
     powerSource: 'generator',
     audienceReach: 'regional',
     catering: 'meat_heavy',
@@ -53,6 +56,11 @@ function toPositiveDuration(value: string): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
+function toPositiveDays(value: string): number {
+  const parsed = Math.round(Number(value));
+  return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
+}
+
 export function toEstimateInput(values: PlannerValues): EstimateInput {
   const physical = isPhysicalFormat(values.format);
   const online = hasOnlineFormat(values.format);
@@ -62,6 +70,7 @@ export function toEstimateInput(values: PlannerValues): EstimateInput {
     attendance: values.format === 'virtual' ? 0 : toNonNegativeInt(values.attendance),
     online_attendance: online ? toNonNegativeInt(values.onlineAttendance) : undefined,
     duration_hours: toPositiveDuration(values.durationHours),
+    days: toPositiveDays(values.days),
     power_source: physical ? values.powerSource : undefined,
     audience_reach: physical ? values.audienceReach : undefined,
     catering: physical ? values.catering : undefined,
@@ -82,11 +91,32 @@ export interface BreakdownCategory {
 
 export const BREAKDOWN_CATEGORIES: BreakdownCategory[] = [
   { key: 'travel', label: 'Travel', color: '#A855F7' },
+  { key: 'accommodation', label: 'Accommodation', color: '#14B8A6' },
   { key: 'catering', label: 'Catering', color: '#EF4444' },
   { key: 'energy', label: 'Energy', color: '#F59E0B' },
   { key: 'waste', label: 'Waste', color: '#22C55E' },
   { key: 'streaming', label: 'Streaming', color: '#3B82F6' }
 ];
+
+export interface BreakdownSegment extends BreakdownCategory {
+  value: number;
+  pct: number;
+}
+
+export function getBreakdownSegments(result: EstimateResult): BreakdownSegment[] {
+  if (result.total <= 0) {
+    return [];
+  }
+
+  return BREAKDOWN_CATEGORIES.map((category) => {
+    const value = result.breakdown[category.key];
+    return {
+      ...category,
+      value,
+      pct: (value / result.total) * 100
+    };
+  }).filter((segment) => segment.value > 0);
+}
 
 export type FootprintLevel = 'good' | 'moderate' | 'high';
 

@@ -17,7 +17,7 @@ export function Segmented({ options, value, onChange }: SegmentedProps) {
           key={option.value}
           type="button"
           onClick={() => onChange(option.value)}
-          className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
             value === option.value ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-300 hover:bg-zinc-800'
           }`}
         >

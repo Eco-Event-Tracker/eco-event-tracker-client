@@ -29,7 +29,11 @@ export function DashboardPage() {
 
           {recentEvents.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-400">
-              No events saved yet. Create a new event to start tracking.
+              No events saved yet.{' '}
+              <Link to="/events/new" className="text-emerald-300 hover:text-emerald-200">
+                Record a past event
+              </Link>{' '}
+              to start tracking.
             </div>
           ) : (
             <ul className="space-y-3">
@@ -74,7 +78,7 @@ export function DashboardPage() {
       <Link
         to="/events/new"
         className="fixed bottom-6 right-6 grid h-14 w-14 place-items-center rounded-3xl border border-zinc-700 bg-zinc-100 text-2xl font-semibold text-zinc-950 shadow-lg shadow-black/40 transition-transform hover:scale-105"
-        aria-label="Create new event"
+        aria-label="Record event"
       >
         +
       </Link>
