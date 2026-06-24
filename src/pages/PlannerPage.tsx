@@ -111,10 +111,13 @@ export function PlannerPage() {
             </div>
 
             {hasResult ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-baseline gap-2">
                 <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: biggestColor }} />
-                <span className="text-sm text-emerald-100">
-                  <span className="capitalize">{result!.biggestContributor.category}</span> is your biggest lever
+                <span className="text-sm text-emerald-100/80">
+                  <span className="font-display text-xl font-semibold capitalize leading-none text-emerald-50 sm:text-2xl">
+                    {result!.biggestContributor.category}
+                  </span>{' '}
+                  is your biggest lever
                 </span>
                 <span className="font-display text-lg font-semibold text-emerald-50">
                   {result!.biggestContributor.pct}%
